@@ -240,11 +240,12 @@ class TwitterOAuth {
       $url = "{$this->stream_host}{$url}.{$this->format}";
     }
 
-    $request = OAuth\Request::from_consumer_and_token($this->consumer, $this->token, 'POST', $url, $parameters);
+    $request = OAuthRequest::from_consumer_and_token($this->consumer, $this->token, 'POST', $url, $parameters);
     $request->sign_request($this->sha1_method, $this->consumer, $this->token);
 
     $this->http_info = array();
     $this->stream_callback = $callback;
+    $this->stream_chunk = '';
     $ci = curl_init();
     /* Curl settings */
     curl_setopt($ci, CURLOPT_USERAGENT, $this->useragent);
@@ -263,9 +264,14 @@ class TwitterOAuth {
   }
 
   function processStream($ci, $str) {
-    $response = $str;
+    $this->stream_chunk .= $str;
     if ($this->format === 'json' && $this->decode_json) {
-      $response = json_decode($response);
+      $response = json_decode($this->stream_chunk);
+      if (is_null($response)) {
+        return strlen($str);
+      } else {
+        $this->stream_chunk = '';
+      }
     }
 
     $continue = false;
