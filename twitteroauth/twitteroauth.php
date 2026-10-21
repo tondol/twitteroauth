@@ -33,6 +33,12 @@ class TwitterOAuth {
   public $decode_json = TRUE;
   /* Contains the last HTTP headers returned. */
   public $http_info;
+  /* Contains the last HTTP status code returned. */
+  public $http_status;
+  /* Contains the last API call. */
+  public $last_api_call;
+  /* Signature method. */
+  public $sha1_method;
   /* Set the useragnet. */
   public $useragent = 'TwitterOAuth v0.2.0-beta2';
   /* Immediately retry the API call if the response was not successful. */
